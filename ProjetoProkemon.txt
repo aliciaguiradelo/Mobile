@@ -1,0 +1,84 @@
+import { Text, SafeAreaView, StyleSheet, View, TextInput, TouchableHighlight, Image } from 'react-native';
+import {useState} from 'react'
+
+//O state é usado sempre que precisamos alterar um dado e avisar que houve mudanças nesse dado
+
+export default function App() {
+
+  const [result, setResult] = useState({
+    name: '',
+    sprites: {
+      front_default: ''
+    }
+  })
+  const [query, setQuery] = useState('')
+
+  
+//passando o n que vai ser o número do pokemon que eu vou pesquisar
+  const func = async n => {
+
+    const url = `https://pokeapi.co/api/v2/pokemon/${n}`
+    console.log(url)
+    fetch(url, {
+    method: 'GET',
+    //vamos passar header pra API só quando ela exigir alguma senha ou validaçõa
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8'
+      }
+      // a função then recebe como parâmetro o response
+      //no primeiro then() eu recebo uma response e coloco em um json
+      //no segundo then() eu pego o json e pego uma resposta
+    }).then((response) => response.json())
+    .then((json) => setResult(json))
+    .catch(
+      setResult({name: 'Pokemon não encontrado',
+        sprites: {
+          front_default: ''
+        }
+      })
+    )
+  }
+  
+//promisse é uma função que só mostra os dados quando buscar tudo
+  return (
+    <View>
+      <TextInput 
+      placeholder='digite um número'
+      onChangeText={(text) => setQuery(text)}/>
+        <TouchableHighlight style={styles.button}
+          onPress={()=> func(query)}
+        >
+          <Text style={styles.paragraph}>Buscar</Text>
+        </TouchableHighlight>
+    
+      <Text>{result.name}</Text>
+      <Image
+  	style={{ width: 100, height: 100 }}
+  	source={{ uri: result.sprites.front_default }}
+	/>
+
+    </View>
+  );
+}
+
+//se pegar um json e jogar numa tag text dá erro pq ela só pode receber string
+//<Text>{result}</Text>}}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: '#ecf0f1',
+    padding: 8,
+  },
+  paragraph: {
+    margin: 24,
+    fontSize: 18,
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  button:{
+    backgroundColor: 'black'
+  }
+});
